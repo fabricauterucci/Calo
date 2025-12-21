@@ -1,7 +1,7 @@
 // Configuración de la API
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:8000'
-    : 'https://tu-api-en-render.onrender.com'; // CAMBIA ESTO por la URL que te dé Render
+    : 'https://calo-backend-x82g.onrender.com';
 
 // API Key de Geoapify
 const GEOAPIFY_API_KEY = 'a4f4d7102b8a40968e725e9f529fbdcd';
