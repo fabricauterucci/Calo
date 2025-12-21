@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Propiedades - Rosario</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .filters {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .filters h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            color: #555;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95em;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 22px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            text-transform: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .property-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .property-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+
+        .property-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3em;
+        }
+
+        .property-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .map-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 0.9em;
+            text-align: center;
+            padding: 20px;
+            font-weight: 600;
+        }
+
+        .property-content {
+            padding: 20px;
+        }
+
+        .property-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .property-title {
+            font-size: 1.1em;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .property-location {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .property-price {
+            font-size: 1.8em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .property-features {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .property-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .source-badge {
+            padding: 4px 10px;
+            background: #f0f0f0;
+            color: #666;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .view-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .view-link:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .no-results-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .no-results h3 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .no-results p {
+            color: #666;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 40px 0;
+            padding: 20px;
+        }
+
+        .pagination button {
+            padding: 12px 24px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .pagination button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .pagination span {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .pet-friendly {
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 Buscador de Propiedades en Rosario</h1>
+            <p class="subtitle">Encuentra tu próximo hogar entre miles de opciones</p>
+        </header>
+
+        <div class="stats" id="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="totalProps">-</div>
+                <div class="stat-label">Propiedades</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="avgPrice">-</div>
+                <div class="stat-label">Precio Promedio</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="minPrice">-</div>
+                <div class="stat-label">Desde</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="maxPrice">-</div>
+                <div class="stat-label">Hasta</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <h2>🔍 Filtros de Búsqueda</h2>
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label for="precioMin">Precio Mínimo</label>
+                    <input type="number" id="precioMin" placeholder="Ej: 50000">
+                </div>
+                <div class="filter-group">
+                    <label for="precioMax">Precio Máximo</label>
+                    <input type="number" id="precioMax" placeholder="Ej: 200000">
+                </div>
+                <div class="filter-group">
+                    <label for="barrio">Barrio</label>
+                    <select id="barrio">
+                        <option value="">Todos los barrios</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="ambientes">Ambientes</label>
+                    <select id="ambientes">
+                        <option value="">Cualquier cantidad</option>
+                        <option value="1">1 ambiente</option>
+                        <option value="2">2 ambientes</option>
+                        <option value="3">3 ambientes</option>
+                        <option value="4">4 ambientes</option>
+                        <option value="5">5+ ambientes</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="tipoPropiedad">Tipo de Propiedad</label>
+                    <select id="tipoPropiedad">
+                        <option value="">Todos los tipos</option>
+                        <option value="casa">🏡 Casa</option>
+                        <option value="departamento">🏢 Departamento</option>
+                        <option value="ph">🏠 PH</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="moneda">Moneda</label>
+                    <select id="moneda">
+                        <option value="">Todas las monedas</option>
+                        <option value="ARS" selected>💵 Pesos (ARS)</option>
+                        <option value="USD">💲 Dólares (USD)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="dormitorios">Dormitorios mínimos</label>
+                    <select id="dormitorios">
+                        <option value="">Cualquier cantidad</option>
+                        <option value="1">1+</option>
+                        <option value="2">2+</option>
+                        <option value="3">3+</option>
+                        <option value="4">4+</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="superficie">Superficie mín. (m²)</label>
+                    <input type="number" id="superficie" placeholder="Ej: 50">
+                </div>
+                <div class="filter-group">
+                    <label for="fuente">Fuente</label>
+                    <select id="fuente">
+                        <option value="">Todas las fuentes</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="ordenar">Ordenar por</label>
+                    <select id="ordenar">
+                        <option value="">Sin ordenar</option>
+                        <option value="precio_asc">Precio: Menor a Mayor</option>
+                        <option value="precio_desc">Precio: Mayor a Menor</option>
+                        <option value="superficie_desc">Superficie: Mayor a Menor</option>
+                        <option value="reciente">Más recientes</option>
+                    </select>
+                </div>
+                <div class="filter-group checkbox-group">
+                    <input type="checkbox" id="mascotas">
+                    <label for="mascotas">🐕 Acepta mascotas</label>
+                </div>
+                <div class="filter-group checkbox-group">
+                    <input type="checkbox" id="patio">
+                    <label for="patio">🌳 Tiene patio</label>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn-primary" onclick="buscarPropiedades()">🔍 Buscar</button>
+                <button class="btn-secondary" onclick="limpiarFiltros()">🔄 Limpiar filtros</button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            Cargando propiedades...
+        </div>
+
+        <div class="results" id="results"></div>
+        
+        <div id="pagination" class="pagination" style="display: none;"></div>
+    </div>
+
+    <script src="app.js?v=5"></script>
+</body>
+</html>
