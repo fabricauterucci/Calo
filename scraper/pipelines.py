@@ -171,9 +171,33 @@ class DatabasePipeline:
         self.engine = create_engine(self.database_url)
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
+        self.items_vistos = [] # Guardaremos las URLs vistas en esta sesión
     
     def close_spider(self, spider):
-        if self.engine:
+        if not self.engine:
+            return
+
+        # LOGICA DE DESACTIVACIÓN: 
+        # Al terminar el spider, marcamos como inactivas las casas de ESTA FUENTE 
+        # que no hayamos visto en este proceso.
+        session = self.Session()
+        try:
+            fuente = spider.name.split('_')[0] # Obtener nombre base (ej: zonaprop)
+            
+            if self.items_vistos:
+                filas_afectadas = session.query(Propiedad).filter(
+                    Propiedad.fuente.ilike(f"%{fuente}%"),
+                    Propiedad.activa == True,
+                    ~Propiedad.url.in_(self.items_vistos)
+                ).update({"activa": False}, synchronize_session=False)
+                
+                session.commit()
+                spider.logger.info(f"🔴 Se marcaron {filas_afectadas} propiedades de {fuente} como inactivas (alquiladas/borradas).")
+        except Exception as e:
+            spider.logger.error(f"Error desactivando items antiguos: {e}")
+            session.rollback()
+        finally:
+            session.close()
             self.engine.dispose()
     
     def process_item(self, item, spider):
@@ -193,6 +217,9 @@ class DatabasePipeline:
                     if key == 'imagenes' and isinstance(value, list):
                         value = ','.join(value)
                     setattr(propiedad, key, value)
+                
+                # Asegurarnos de que vuelva a estar activa si reaparece
+                propiedad.activa = True
                 spider.logger.info(f"Actualizado: {adapter['url']}")
             else:
                 # Crear nuevo
@@ -204,6 +231,8 @@ class DatabasePipeline:
                 session.add(propiedad)
                 spider.logger.info(f"Nuevo: {adapter['url']}")
             
+            # Registrar URL vista
+            self.items_vistos.append(adapter['url'])
             session.commit()
             
         except Exception as e:
