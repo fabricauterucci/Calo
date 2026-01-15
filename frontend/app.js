@@ -1,5 +1,5 @@
 // Configuración de la API
-const API_URL = 'http://localhost:8000';
+const API_URL = 'https://calo-q9g8.onrender.com';
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
