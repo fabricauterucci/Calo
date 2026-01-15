@@ -29,6 +29,9 @@ class Propiedad(Base):
     ciudad = Column(String(100), index=True)
     barrio = Column(String(100), index=True)
     direccion = Column(String(500))
+    latitud = Column(Float)
+    longitud = Column(Float)
+    mapa_url = Column(String(1000))
     
     # Características
     precio = Column(Float, index=True)
@@ -80,6 +83,9 @@ class PropiedadResponse(BaseModel):
     dormitorios: Optional[int]
     banos: Optional[int]
     superficie_total: Optional[float]
+    
+    latitud: Optional[float]
+    longitud: Optional[float]
     
     mascotas: Optional[bool]
     patio: Optional[bool]
