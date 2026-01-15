@@ -29,9 +29,12 @@ jobs:
 
     - name: 🕷️ Ejecutar Spiders
       run: |
-        # Ejecutamos directamente los comandos de scrapy en lugar del script bash
-        # para tener mejor control del entorno en el CI
-        echo "Iniciando scraping..."
+        # LIMPIEZA TOTAL: Borramos la DB para empezar de cero cada día
+        # Así garantizamos que no haya "fantasmas" de casas ya alquiladas.
+        rm -f propiedades.db
+        touch propiedades.db
+        
+        echo "Iniciando scraping desde cero..."
         
         # Lista de spiders a ejecutar
         spiders=("zonaprop" "argenprop" "remax" "mapropiedades" "lacapital" "bienesrosario")
